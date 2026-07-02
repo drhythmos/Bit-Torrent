@@ -329,31 +329,6 @@ Hello BitTorrent
 
 ---
 
-# Optional Commands
-
-## Show Downloads
-
-Client 2:
-
-```text
-show_downloads
-```
-
-## Logout
-
-Client 1:
-
-```text
-logout
-```
-
-Client 2:
-
-```text
-logout
-```
-
----
 
 # Stop the Tracker
 
