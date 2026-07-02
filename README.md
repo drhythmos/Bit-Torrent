@@ -179,3 +179,239 @@ stop_share ​<group_id> <file_name>
 2. The peer can login from different IP addresses, but the details of his downloads/uploads will not be persistent across sessions.
 3. SHA1 integrity checking doesn't work correctly for binary files, even though in most likelihood the file would have downloaded correctly.
 4. File paths should be absolute.
+
+
+
+
+
+# BitTorrent P2P File Sharing System - Demo Guide
+
+This guide demonstrates the complete workflow of the BitTorrent-based Peer-to-Peer File Sharing System.
+
+---
+
+## Prerequisites
+
+- Ubuntu / WSL
+- Tracker and Client already compiled using `make`
+
+---
+
+# Terminal 1 – Start Tracker
+
+```bash
+cd /mnt/c/Users/rakes/Bit-Torrent/tracker
+./tracker ../tracker_info.txt 1
+```
+
+> Leave this terminal running.
+
+---
+
+# Terminal 2 – Start Client 1 (Alice)
+
+```bash
+cd /mnt/c/Users/rakes/Bit-Torrent/client
+./client 127.0.0.1:18000 ../tracker_info.txt
+```
+
+Execute the following commands:
+
+```text
+create_user alice 123
+login alice 123
+create_group group1
+```
+
+---
+
+# Terminal 3 – Start Client 2 (Bob)
+
+```bash
+cd /mnt/c/Users/rakes/Bit-Torrent/client
+./client 127.0.0.1:18001 ../tracker_info.txt
+```
+
+Execute the following commands:
+
+```text
+create_user bob 123
+login bob 123
+join_group group1
+```
+
+---
+
+# Terminal 2 – Accept Bob's Request
+
+Execute:
+
+```text
+list_requests group1
+accept_request group1 bob
+```
+
+---
+
+# Terminal 4 – Create a Sample File
+
+Create a sample file for sharing.
+
+```bash
+echo "Hello BitTorrent" > ~/sample.txt
+```
+
+Verify:
+
+```bash
+cat ~/sample.txt
+```
+
+Expected Output:
+
+```text
+Hello BitTorrent
+```
+
+---
+
+# Terminal 2 – Upload the File
+
+```text
+upload_file /home/rakes/sample.txt group1
+```
+
+---
+
+# Terminal 3 – List Available Files
+
+```text
+list_files group1
+```
+
+Expected Output:
+
+```text
+sample.txt
+```
+
+---
+
+# Terminal 4 – Create Download Directory
+
+```bash
+mkdir -p ~/downloads
+```
+
+---
+
+# Terminal 3 – Download the File
+
+```text
+download_file group1 sample.txt /home/rakes/downloads
+```
+
+---
+
+# Terminal 4 – Verify Download
+
+```bash
+ls ~/downloads
+cat ~/downloads/sample.txt
+```
+
+Expected Output:
+
+```text
+sample.txt
+Hello BitTorrent
+```
+
+---
+
+# Optional Commands
+
+## Show Downloads
+
+Client 2:
+
+```text
+show_downloads
+```
+
+## Logout
+
+Client 1:
+
+```text
+logout
+```
+
+Client 2:
+
+```text
+logout
+```
+
+---
+
+# Stop the Tracker
+
+Go to **Terminal 1** and press:
+
+```text
+Ctrl + C
+```
+
+or, if supported:
+
+```text
+quit
+```
+
+---
+
+# Demo Workflow Summary
+
+```
+Tracker
+   │
+   ├── Maintains metadata
+   │
+   ├───────────────┐
+   │               │
+Client 1        Client 2
+(Alice)           (Bob)
+   │               │
+Create Group       Join Group
+   │               │
+Accept Request     │
+   │               │
+Upload File ─────► Download File
+                     │
+             Verify Download
+```
+
+---
+
+# Features Demonstrated
+
+- Tracker initialization
+- User registration and login
+- Group creation
+- Group join request
+- Admin approval of join request
+- File upload
+- File discovery (`list_files`)
+- Peer-to-peer file download
+- Download verification
+- Logout
+
+---
+
+# Notes
+
+- The tracker stores only metadata (users, groups, and file-peer mappings).
+- Actual file transfer occurs directly between peers.
+- File integrity is verified using SHA-1 hashes.
+- File paths supplied to `upload_file` and `download_file` must be **absolute paths**.
